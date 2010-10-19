@@ -12,23 +12,23 @@
 
 #include <inttypes.h>
 #include <avr/pgmspace.h>
-#include <Ethernet.h>
-#include <EthernetDNS.h>
 
 class Twitter
 {
 private:
 	uint8_t parseStatus;
 	int statusCode;
-	const char *token;
-	Client client;
+	char *name;
+        char *password;
+	char* lastSearch;
+	char* lastId;
+
 public:
-	Twitter(const char *user_and_passwd);
+	Twitter(char *name, char*password);
 	
-	bool post(const char *msg);
-	bool checkStatus(void);
-	int  wait(void);
+	bool post(char *msg);
 	int  status(void) { return statusCode; }
+	char search(char* term);
 };
 
 #endif	//TWITTER_H
