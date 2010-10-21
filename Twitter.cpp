@@ -11,8 +11,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <HTTPClient.h>
+#include <HardwareSerial.h>
 
 char* twitter_api_server = "api.supertweet.net";
+char* twitter_search = "search.twitter.com";
 
 Twitter::Twitter(char *name, char *password) : name(name), password(password)
 {
@@ -28,7 +30,7 @@ bool Twitter::post(char *msg)
 }
 
 char Twitter::search(char* searchTerm) {
-  //different search - henca different lastId
+  //different search - hence different lastId
   if (strcmp(lastSearch,searchTerm)!=0) {
       lastSearch=searchTerm;
       if (lastId!=NULL) {
@@ -39,12 +41,17 @@ char Twitter::search(char* searchTerm) {
 
   char requestbuffer[64];
   if (lastId==NULL) {
-      sprintf("/search.json\?result_type=recent&q=%s",searchTerm);
+      sprintf(requestbuffer,"/search.json\?result_type=recent&q=%s",searchTerm);
   } else {
-      sprintf("/search.json\?result_type=recent&q=%s&since_id=%s",searchTerm,lastId);
+      sprintf(requestbuffer,"/search.json\?result_type=recent&q=%s&since_id=%s",searchTerm,lastId);
   }
-  HTTPClient client = HTTPClient(twitter_api_server,name,password);
-  FILE* stream = client.getURI("/search.json\?result_type=recent&q=");
+
+  HTTPClient client = HTTPClient(twitter_search);
+	Serial.println(requestbuffer);
+	client.debug(-1);
+  FILE* stream = client.getURI(requestbuffer);
+	Serial.print("answer ");
+	Serial.print(client.getLastReturnCode());
   char id_buffer[16];
   char results=0;
   //while we are able to scan the id
